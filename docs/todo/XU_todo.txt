@@ -1,0 +1,55 @@
+
+
+2009-11-1
+1） 对\src\ctc\tdcs\db\minadata下文件StatinServeice.java中调用方法closeConnection(Constants.CLIENT_CLOSE_NORMAL)的方式增加参数Constants.CLIENT_CLOSE_NORMAL
+2）对\src\ctc\sics\db\Database类中closeMinaClient()方法中调用方法closeConnection增加参数Constants.CLIENT_CLOSE_NORMAL
+
+3）对\src\ctc\sics目录下SicsMain类的方法start添加显示车站名的参数，相应地增加stationName变量，同时修改
+语句：shell.setText("CTC仿真系统之学生客户端——车站连锁"); 为：shell.setText("CTC仿真系统之学生客户端(车站连锁)" + stationName);
+
+4）添加日志处理，解决过去出现的警告信息 ，使用方法见CTCClient_S中的语句
+private final static Logger LOGGER = LoggerFactory.getLogger(CTCClient_S.class);
+及LOGGER.info("服务器连接出错");目前没有真正用,建议使用ErrorLog
+          需要处理的是，在工程文件的build path中删除slf4j-simple-1.5.8类，添加slf4j-log4j12-1.5.0类。（这些文件位于工程文件lib目录下）
+log输出的定位与C:/CTCLogs目录下
+
+5)为了能纯送更多的数据，修改Database类中的方法setvrTime(vrTime)为：startRun(P2PCommandResponseMessage rMsg)
+同时，对stationLayoutInit中的setvrTime(vrTime)方法也进行相应的修改
+
+6)将database中synClientSupport和asynClientSupport的访问权限修改为public，即
+public static SynClientSupport synClientSupport;  //同步通信句柄
+public static AsynClientSupport asynClientSupport;  //异步通信句柄 
+ 
+ 
+ 
+/////////////////////////////////////////////////////////////
+关于学生界面很小的问题的解决：
+SicsMainWindow类中，方法createContents()最后的语句更改为：
+        comShell = new Composite(shell,SWT.NONE);   
+        comShell.setLayoutData(new GridData(GridData.FILL_BOTH));
+        new StationLayoutInit().run(shell,comShell,minaClient,db);
+就行了。第1个标准版本语句为：
+        comShell = new Composite(shell,SWT.NONE);   
+        //comShell.setSize(600, 400);
+        //comShell.setLayoutData(new GridData(GridData.FILL_BOTH));
+        //DrawInit.baseDraw(shell, comShell);
+        new StationLayoutInit().run(shell,comShell,minaClient,db);
+        shell.pack();
+        
+        
+
+StationLayoutInit.java
+
+原：p192行
+System.out.println("\n----------------------------结束----------------------------");
+			int listLen = stationList.size();
+			
+修改为：
+   
+  int listLen = 0;
+			if(stationList != null)
+				listLen = stationList.size();
+
+
+
+
